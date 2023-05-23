@@ -2,6 +2,7 @@
 // node
 const path = require('path');
 
+
 // npm
 const webpack = require('webpack');
 const CopyPlugin = require('copy-webpack-plugin');
@@ -26,6 +27,7 @@ module.exports = {
       patterns: [{
         from: './src/assets',
         to: './assets',
+        noErrorOnMissing: true,
       }],
     }),
     new webpack.ProgressPlugin(),
@@ -82,7 +84,6 @@ module.exports = {
   },
   devServer: {
     open: true,
-    disableHostCheck: true,
     headers: {
       'Access-Control-Allow-Origin': '*',
       'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, PATCH, OPTIONS',
