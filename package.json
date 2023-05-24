@@ -11,7 +11,7 @@
     "build": "webpack"
   },
   "dependencies": {
-    "pixi.js": "^7.2.4"
+    "pixi.js": "^6.5.9"
   },
   "devDependencies": {
     "@babel/core": "^7.21.8",

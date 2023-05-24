@@ -1,12 +1,36 @@
 import { Application } from 'pixi.js';
+import './global.scss';
+import { assetsMap } from './assetsMap';
+import type { SpriteLoadDescription } from './descriptions';
+// import { assetsMap } from './assetsMap';
+// import type { SpriteLoadDescription } from './descriptions';
 
-const app = new Application<HTMLCanvasElement>({
-  width: 1400,
-  height: 800,
-  backgroundColor: 'blue',
-});
+// load assets
 
-document.body.appendChild(app.view);
+export default class Game {
+  private game: Application;
 
-app.view.width = 1400;
-app.view.height = 800;
+  constructor() {
+    this.game = new Application({
+      width: screen.width,
+      height: screen.height,
+      backgroundColor: 0x00c1ac,
+    });
+    document.body.appendChild(this.game.view);
+    this.loadAssets();
+  }
+
+  private loadAssets() {
+    assetsMap.sprites?.forEach((sprite: SpriteLoadDescription) => {
+      this.game.loader.add(sprite.name, sprite.url);
+    });
+    this.game.loader.load(this.startGame);
+  }
+
+  private startGame() {
+    console.log('GAME IS STARTED!!!');
+  }
+}
+
+// init
+new Game();
