@@ -31,8 +31,6 @@ class Game {
 
   private startGame() {
     this.game.stage.position.set(window.innerWidth / 2, window.innerHeight / 2);
-    console.log('GAME IS STARTED!');
-
     this.playfield = new Playfield(this.game.stage);
   }
 }
