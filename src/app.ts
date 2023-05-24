@@ -2,13 +2,14 @@ import { Application } from 'pixi.js';
 import './global.scss';
 import { assetsMap } from './assetsMap';
 import type { SpriteLoadDescription } from './descriptions';
-// import { assetsMap } from './assetsMap';
-// import type { SpriteLoadDescription } from './descriptions';
+import { Playfield } from './objects/Playfield';
 
 // load assets
 
-export default class Game {
+class Game {
   private game: Application;
+
+  public playfield: Playfield;
 
   constructor() {
     this.game = new Application({
@@ -24,11 +25,15 @@ export default class Game {
     assetsMap.sprites?.forEach((sprite: SpriteLoadDescription) => {
       this.game.loader.add(sprite.name, sprite.url);
     });
-    this.game.loader.load(this.startGame);
+    this.game.loader.load(() => this.startGame());
+    this.game.renderer.resize(window.innerWidth, window.innerHeight);
   }
 
   private startGame() {
-    console.log('GAME IS STARTED!!!');
+    this.game.stage.position.set(window.innerWidth / 2, window.innerHeight / 2);
+    console.log('GAME IS STARTED!');
+
+    this.playfield = new Playfield(this.game.stage);
   }
 }
 
