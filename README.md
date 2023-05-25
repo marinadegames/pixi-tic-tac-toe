@@ -4,7 +4,7 @@
 
 ## Authors
 
-- [@marinadegames](https://www.github.com/marinadegame) - Eugene Pashkevich
+- [@marinadegames](https://www.github.com/marinadegames) - Eugene Pashkevich
 
 
 
