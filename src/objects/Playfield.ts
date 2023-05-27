@@ -130,21 +130,21 @@ export class Playfield {
   private checkWin(checking: 1 | 2) {
     //1 = player, 2 = pc
     // check horizontal lines
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       if (this.matrix[i][0] === checking && this.matrix[i][1] === checking && this.matrix[i][2] === checking) {
         return true;
       }
     }
 
     // check vertical lines
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       if (this.matrix[0][i] === checking && this.matrix[1][i] === checking && this.matrix[2][i] === checking) {
         return true;
       }
     }
 
     // check diagonal
-    for (let i = 0; i < 2; i++) {
+    for (let i = 0; i < 3; i++) {
       if (this.matrix[0][0] === checking && this.matrix[1][1] === checking && this.matrix[2][2] === checking) {
         return true;
       } else if (this.matrix[0][2] === checking && this.matrix[1][1] === checking && this.matrix[2][0] === checking) {
