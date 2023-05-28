@@ -5,7 +5,13 @@ export type SpriteLoadDescription = {
 
 export interface AssetsMapTypeDescriptions {
   sprites?: Array<SpriteLoadDescription>;
+  sequences?: Array<SequencesLoadDescription>;
 }
+
+export type SequencesLoadDescription = {
+  name: string;
+  url: string;
+};
 
 export type MatrixType = Array<Array<number>>;
 
