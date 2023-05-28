@@ -17,10 +17,10 @@ export class Field extends Container {
       this.addChild(this.textureCreator('win_highlight', true, false));
     } else if (texture === 1) {
       this.children[0].destroy();
-      this.addChild(this.textureCreator('cross-win_29', false, true));
+      this.addChild(this.textureCreator('cross-draw_19', false, true));
     } else if (texture === 2) {
       this.children[0].destroy();
-      this.addChild(this.textureCreator('circle-win_29', false, true));
+      this.addChild(this.textureCreator('circle-draw_19', false, true));
     }
   }
 
@@ -38,14 +38,11 @@ export class Field extends Container {
   }
 
   public activateInteractive() {
-    console.log(this.children);
     this.children[0].interactive = true;
     this.children[0].buttonMode = true;
   }
 
   public disableInteractive() {
-    console.log(this.children);
-
     this.children[0].interactive = false;
     this.children[0].buttonMode = false;
   }

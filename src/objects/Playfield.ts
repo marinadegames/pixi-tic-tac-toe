@@ -1,10 +1,9 @@
+import * as PIXI from 'pixi.js';
 import { Container, Sprite, Texture } from 'pixi.js';
 import type { MatrixType } from '../descriptions';
 import { Field } from './Field';
-import * as PIXI from 'pixi.js';
 import { GameEventEmitter } from './EventEmmiter';
 import { PlayfieldPositionDescription } from './PlayfieldPositionDescription';
-import { isMainThread } from 'worker_threads';
 
 export class Playfield extends Container {
   private readonly playfield: Sprite;
@@ -56,7 +55,6 @@ export class Playfield extends Container {
     this.addChild(animCross);
     animCross.animationSpeed = 0.6;
 
-    console.log(this.matrix);
     let counterIterable = 0;
     for (let i = 0; i < this.matrix.length; i++) {
       for (let j = 0; j < this.matrix[i].length; j++) {
@@ -67,7 +65,7 @@ export class Playfield extends Container {
           animCross.onComplete = () => {
             this.fields[i][j].changeTexture(1);
             animCross.destroy();
-            this.checkWin();
+            this.checkPlayerWin();
           };
           return;
         } else {
@@ -88,18 +86,20 @@ export class Playfield extends Container {
     return new PIXI.AnimatedSprite(resultArrSeq);
   }
 
-  private checkWin() {
+  private checkPlayerWin() {
     if (this.checkWinLines(1) === true) {
-      // player win
       this.endGame(1);
     } else {
       this.opponentMove();
-      if (this.checkWinLines(2) === true) {
-        // opponent win
-        this.endGame(2);
-      } else {
-        this.buttonsActivate();
-      }
+    }
+  }
+
+  private checkOpponentWin() {
+    if (this.checkWinLines(2) === true) {
+      // opponent win
+      this.endGame(2);
+    } else {
+      this.buttonsActivate();
     }
   }
 
@@ -133,32 +133,51 @@ export class Playfield extends Container {
   }
 
   private opponentMove() {
-    const getPosition = Math.floor(Math.random() * 9);
     let counterIterable = 0;
-
-    console.log(getPosition);
+    let possiblePositionsForCircleDraw = [];
 
     for (let i = 0; i < this.matrix.length; i++) {
       for (let j = 0; j < this.matrix[i].length; j++) {
-        if (counterIterable === getPosition && this.matrix[i][j] === 0) {
-          const animCircle = this.createAnimation(this.resources.sequence.textures, 'circle-draw');
-          animCircle.loop = false;
-          animCircle.anchor.set(0.5, 0.5);
-          this.addChild(animCircle);
-          animCircle.animationSpeed = 0.6;
-          animCircle.position.set(PlayfieldPositionDescription[getPosition].x, PlayfieldPositionDescription[getPosition].y);
-          animCircle.play();
-          animCircle.onComplete = () => {
-            this.matrix[i][j] = 2;
-            this.fields[i][j].changeTexture(2);
-            this.checkWin();
-            animCircle.stop();
-          };
+        if (this.matrix[i][j] === 0) {
+          possiblePositionsForCircleDraw.push(PlayfieldPositionDescription[counterIterable].id - 1);
+          counterIterable++;
         } else {
           counterIterable++;
         }
       }
     }
+    const getPosition = Math.floor(Math.random() * possiblePositionsForCircleDraw.length);
+    const resultChoice = possiblePositionsForCircleDraw[getPosition];
+
+    counterIterable = 0;
+
+    for (let i = 0; i < this.matrix.length; i++) {
+      for (let j = 0; j < this.matrix[i].length; j++) {
+        if (counterIterable === resultChoice) {
+          this.matrix[i][j] = 2;
+          this.drawCircle(i, j, resultChoice);
+          return;
+        } else {
+          counterIterable++;
+        }
+      }
+    }
+  }
+
+  private drawCircle(posX: number, posY: number, position: number) {
+    const animCircle = this.createAnimation(this.resources.sequence.textures, 'circle-draw');
+    animCircle.loop = false;
+    animCircle.anchor.set(0.5, 0.5);
+    this.addChild(animCircle);
+    animCircle.animationSpeed = 0.6;
+    animCircle.position.set(PlayfieldPositionDescription[position].x, PlayfieldPositionDescription[position].y);
+    animCircle.play();
+    animCircle.onComplete = () => {
+      this.fields[posX][posY].changeTexture(2);
+      this.checkOpponentWin();
+      animCircle.destroy();
+      return;
+    };
   }
 
   private buttonsActivate() {
@@ -192,165 +211,4 @@ export class Playfield extends Container {
       console.log('PC IS WIN!');
     }
   }
-
-  // private spriteCreator(texture: string, x: number, y: number): Sprite {
-  //   const sprite = new Sprite(Texture.from(texture));
-  //   sprite.anchor.set(0.5, 0.5);
-  //   sprite.position.set(x, y);
-  //   return sprite;
-  // }
-
-  // private drawCrossesAndZeros() {
-  //   let counterIterable = 0;
-  //   for (let i = 0; i < this.matrix.length; i++) {
-  //     for (let j = 0; j < this.matrix[i].length; j++) {
-  //       const num = this.matrix[i][j];
-  //       const posX = PlayfieldPositionDescription[counterIterable].x;
-  //       const posY = PlayfieldPositionDescription[counterIterable].y;
-  //       const posId = PlayfieldPositionDescription[counterIterable].id;
-  //       if (num === 0) {
-  //         // empty field
-  //         const item = this.createHighlightBackground(posX, posY, posId, true);
-  //         this.container.addChild(item);
-  //         this.needToDestroyChild.push(item);
-  //       } else if (num === 1) {
-  //         // cross, player
-  //         this.container.addChild(this.createHighlightBackground(posX, posY, posId, false));
-  //         this.container.addChild(this.spriteCreator('cross-draw_19', posX, posY));
-  //       } else if (num === 2) {
-  //         // zero, pc
-  //         this.container.addChild(this.createHighlightBackground(posX, posY, posId, false));
-  //         this.container.addChild(this.spriteCreator('zero', posX, posY));
-  //       }
-  //       counterIterable++;
-  //     }
-  //   }
-  // }
-  //
-  // private computerMove() {
-  //   const resultPosX = Math.floor(Math.random() * 3);
-  //   const resultPosY = Math.floor(Math.random() * 3);
-  //
-  //   if (this.matrix[resultPosX][resultPosY] === 0) {
-  //     this.matrix[resultPosX].splice(resultPosY, 1, 2);
-  //   } else {
-  //     let counterCheckLastField = 0;
-  //     for (let i = 0; i < this.matrix.length; i++) {
-  //       for (let j = 0; j < this.matrix[i].length; j++) {
-  //         if (this.matrix[i][j] === 0) {
-  //           counterCheckLastField++;
-  //         }
-  //       }
-  //     }
-  //     if (counterCheckLastField <= 1) {
-  //       this.endGame(0);
-  //     } else {
-  //       this.computerMove();
-  //     }
-  //   }
-  // }
-  //
-  // private createHighlightBackground(x: number, y: number, id: number, isInteractive: boolean, isVisible?: boolean): Sprite {
-  //   const highlightSprite = new Sprite(Texture.from('win_highlight'));
-  //   highlightSprite.anchor.set(0.5, 0.5);
-  //   highlightSprite.position.set(x, y);
-  //   highlightSprite.alpha = isVisible ? 1 : 0;
-  //   if (isInteractive) {
-  //     highlightSprite.interactive = true;
-  //     highlightSprite.buttonMode = true;
-  //     highlightSprite.once('pointerdown', () => this.fieldClickHandler(id));
-  //   }
-  //   return highlightSprite;
-  // }
-  //
-  // private spriteCreator(texture: string, x: number, y: number): Sprite {
-  //   const sprite = new Sprite(Texture.from(texture));
-  //   sprite.anchor.set(0.5, 0.5);
-  //   sprite.position.set(x, y);
-  //   return sprite;
-  // }
-  //
-  // private fieldClickHandler(id: number) {
-  //   console.log('yes');
-  //
-  //   const crossAnimation: PIXI.AnimatedSprite = this.createAnimation(this.resources.sequence.textures, 'cross-draw');
-  //   crossAnimation.loop = false;
-  //   crossAnimation.animationSpeed = 0.7;
-  //   crossAnimation.anchor.set(0.5, 0.5);
-  //   this.container.addChild(crossAnimation);
-  //
-  //   this.needToDestroyChild?.forEach((child) => child.destroy());
-  //   this.needToDestroyChild = [];
-  //   let counterIterable = 1;
-  //   for (let i = 0; i < this.matrix.length; i++) {
-  //     for (let j = 0; j < this.matrix[i].length; j++) {
-  //       if (counterIterable === id) {
-  //         this.matrix[i].splice(j, 1, 1);
-  //         crossAnimation.position.set(PlayfieldPositionDescription[i].x, PlayfieldPositionDescription[j].y);
-  //         crossAnimation.play();
-  //         crossAnimation.onComplete = () => {
-  //           this.checkWin();
-  //         };
-  //       } else {
-  //         counterIterable++;
-  //       }
-  //     }
-  //   }
-  // }
-  //
-  // private checkWin() {
-  //   if (this.checkWinLines(1) === true) {
-  //     // player win
-  //     this.drawCrossesAndZeros();
-  //     this.endGame(1);
-  //   } else {
-  //     this.computerMove();
-  //     this.drawCrossesAndZeros();
-  //     if (this.checkWinLines(2) === true) {
-  //       this.endGame(2);
-  //     }
-  //   }
-  // }
-  //
-  // private checkWinLines(checking: 1 | 2) {
-  //   //1 = player, 2 = pc
-  //   // check horizontal lines
-  //   for (let i = 0; i < 3; i++) {
-  //     if (this.matrix[i][0] === checking && this.matrix[i][1] === checking && this.matrix[i][2] === checking) {
-  //       return true;
-  //     }
-  //   }
-  //
-  //   // check vertical lines
-  //   for (let i = 0; i < 3; i++) {
-  //     if (this.matrix[0][i] === checking && this.matrix[1][i] === checking && this.matrix[2][i] === checking) {
-  //       return true;
-  //     }
-  //   }
-  //
-  //   // check diagonal
-  //   for (let i = 0; i < 3; i++) {
-  //     if (this.matrix[0][0] === checking && this.matrix[1][1] === checking && this.matrix[2][2] === checking) {
-  //       return true;
-  //     } else if (this.matrix[0][2] === checking && this.matrix[1][1] === checking && this.matrix[2][0] === checking) {
-  //       return true;
-  //     }
-  //   }
-  //
-  //   // no win
-  //   return false;
-  // }
-  //
-  // private endGame(whoIsWin: 0 | 1 | 2) {
-  //   if (whoIsWin === 0) {
-  //     console.log('DRAW');
-  //   }
-  //   if (whoIsWin === 1) {
-  //     console.log('PLAYER IS WIN!');
-  //   }
-  //   if (whoIsWin === 2) {
-  //     console.log('PC IS WIN!');
-  //   }
-  // }
-  //
 }
