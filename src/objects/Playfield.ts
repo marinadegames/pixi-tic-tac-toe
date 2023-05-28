@@ -47,7 +47,7 @@ export class Playfield extends Container {
       fontSize: 90,
     });
     this.bitmapFontLight.anchor.set(0.5, 0.5);
-    this.bitmapFontLight.position.set(window.screenX / 2, -570);
+    this.bitmapFontLight.position.set(0, -520);
     this.addChild(this.bitmapFontLight);
   }
 
@@ -105,7 +105,7 @@ export class Playfield extends Container {
     animCross.loop = false;
     animCross.anchor.set(0.5, 0.5);
     this.addChild(animCross);
-    animCross.animationSpeed = 0.6;
+    animCross.animationSpeed = 0.8;
 
     let counterIterable = 0;
     for (let i = 0; i < this.matrix.length; i++) {
@@ -249,7 +249,7 @@ export class Playfield extends Container {
     animCircle.loop = false;
     animCircle.anchor.set(0.5, 0.5);
     this.addChild(animCircle);
-    animCircle.animationSpeed = 0.6;
+    animCircle.animationSpeed = 0.8;
     animCircle.position.set(PlayfieldPositionDescription[position].x, PlayfieldPositionDescription[position].y);
     animCircle.play();
     animCircle.onComplete = () => {
