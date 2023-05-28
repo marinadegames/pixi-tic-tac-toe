@@ -5,9 +5,15 @@ export type SpriteLoadDescription = {
   url: string;
 };
 
+export type BitmapFontLoadDescription = {
+  name: string;
+  url: string;
+};
+
 export interface AssetsMapTypeDescriptions {
   sprites?: Array<SpriteLoadDescription>;
   sequences?: Array<SequencesLoadDescription>;
+  bitMapFonts?: Array<BitmapFontLoadDescription>;
 }
 
 export type SequencesLoadDescription = {

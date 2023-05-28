@@ -18,6 +18,7 @@ export class Playfield extends Container {
   private readonly resources;
   private readonly game;
   private readonly restartButtonContainer: Container;
+  private bitmapFontLight: PIXI.BitmapText;
 
   constructor(game, resources) {
     super();
@@ -27,14 +28,27 @@ export class Playfield extends Container {
     this.restartButtonContainer = new Container();
     this.playfield = new Sprite(Texture.from('playfield'));
     this.playfield.anchor.set(0.5, 0.5);
+
     this.fieldsCreator();
     this.createRestartButton();
+    this.createBitMapFont();
 
     this.addChild(this.restartButtonContainer);
     this.addChild(this.playfield);
 
     // events
     GameEventEmitter.on('FIELD_CLICK_HANDLER', (args) => this.clickFieldHandler(args));
+  }
+
+  private createBitMapFont() {
+    this.bitmapFontLight = new PIXI.BitmapText('TIC TAC TOE', {
+      fontName: 'lightFont',
+      align: 'center',
+      fontSize: 90,
+    });
+    this.bitmapFontLight.anchor.set(0.5, 0.5);
+    this.bitmapFontLight.position.set(0, -520);
+    this.addChild(this.bitmapFontLight);
   }
 
   private createRestartButton() {
@@ -69,7 +83,7 @@ export class Playfield extends Container {
     }
 
     this.fields = [[], [], []];
-
+    this.bitmapFontLight.text = 'TIC TAC TOE';
     this.fieldsCreator();
   }
 
@@ -91,7 +105,7 @@ export class Playfield extends Container {
     animCross.loop = false;
     animCross.anchor.set(0.5, 0.5);
     this.addChild(animCross);
-    animCross.animationSpeed = 0.6;
+    animCross.animationSpeed = 0.8;
 
     let counterIterable = 0;
     for (let i = 0; i < this.matrix.length; i++) {
@@ -235,7 +249,7 @@ export class Playfield extends Container {
     animCircle.loop = false;
     animCircle.anchor.set(0.5, 0.5);
     this.addChild(animCircle);
-    animCircle.animationSpeed = 0.6;
+    animCircle.animationSpeed = 0.8;
     animCircle.position.set(PlayfieldPositionDescription[position].x, PlayfieldPositionDescription[position].y);
     animCircle.play();
     animCircle.onComplete = () => {
@@ -268,14 +282,14 @@ export class Playfield extends Container {
     this.buttonsDisabling();
 
     if (whoIsWin === 0) {
-      console.log('DRAW');
+      this.bitmapFontLight.text = 'DRAW';
     }
     if (whoIsWin === 1) {
-      console.log('PLAYER IS WIN!');
+      this.bitmapFontLight.text = 'THE PLAYER WON!';
       this.activateHighlightsAndAnimation(1);
     }
     if (whoIsWin === 2) {
-      console.log('PC IS WIN!');
+      this.bitmapFontLight.text = 'THE OPPONENT HAS WON!';
       this.activateHighlightsAndAnimation(2);
     }
   }

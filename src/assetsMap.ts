@@ -6,4 +6,10 @@ export const assetsMap: AssetsMapTypeDescriptions = {
     { name: 'win_highlight', url: './assets/images/win_highlight.png' },
   ],
   sequences: [{ name: 'sequence', url: './assets/sequences/sequence.json' }],
+  bitMapFonts: [
+    {
+      name: 'bitmapFontLight',
+      url: './assets/bitmapFonts/lightFont.fnt',
+    },
+  ],
 };
