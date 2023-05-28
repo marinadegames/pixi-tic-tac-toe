@@ -87,19 +87,47 @@ export class Playfield extends Container {
   }
 
   private checkPlayerWin() {
+    let counterLastChance = 0;
+    for (let i = 0; i < this.matrix.length; i++) {
+      for (let j = 0; j < this.matrix[i].length; j++) {
+        if (this.matrix[i][j] === 0) {
+          counterLastChance++;
+        }
+      }
+    }
+
     if (this.checkWinLines(1) === true) {
       this.endGame(1);
     } else {
-      this.opponentMove();
+      if (counterLastChance < 1) {
+        // draw
+        this.endGame(0);
+      } else {
+        this.opponentMove();
+      }
     }
   }
 
   private checkOpponentWin() {
-    if (this.checkWinLines(2) === true) {
-      // opponent win
-      this.endGame(2);
+    let counterLastChance = 0;
+    for (let i = 0; i < this.matrix.length; i++) {
+      for (let j = 0; j < this.matrix[i].length; j++) {
+        if (this.matrix[i][j] === 0) {
+          counterLastChance++;
+        }
+      }
+    }
+
+    if (counterLastChance < 1) {
+      // draw
+      this.endGame(0);
     } else {
-      this.buttonsActivate();
+      if (this.checkWinLines(2) === true) {
+        // opponent win
+        this.endGame(2);
+      } else {
+        this.buttonsActivate();
+      }
     }
   }
 
