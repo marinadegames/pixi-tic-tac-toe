@@ -1,12 +1,10 @@
 
-![Logo](./src/assets/images/logo.png)
+![Logo](./src/assets/images/show.png)
 
 
 ## Authors
 
 - [@marinadegames](https://www.github.com/marinadegames) - Eugene Pashkevich
-
-
 
 
 ## Run Locally. Steps:
