@@ -1,3 +1,5 @@
+import { ImageResource } from 'pixi.js';
+
 export type SpriteLoadDescription = {
   name: string;
   url: string;
