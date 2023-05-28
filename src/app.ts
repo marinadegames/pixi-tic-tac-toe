@@ -1,6 +1,6 @@
 import './global.scss';
 import { assetsMap } from './assetsMap';
-import type { SpriteLoadDescription } from './descriptions';
+import type { BitmapFontLoadDescription, SpriteLoadDescription } from './descriptions';
 import { Playfield } from './objects/Playfield';
 import * as PIXI from 'pixi.js';
 
@@ -29,11 +29,15 @@ export class Game {
     assetsMap.sequences?.forEach((seq: SpriteLoadDescription) => {
       this.game.loader.add(seq.name, seq.url);
     });
+    assetsMap.bitMapFonts.forEach((font: BitmapFontLoadDescription) => {
+      this.game.loader.add(font.name, font.url);
+    });
     this.game.loader.load((loader, res) => this.startGame(loader, res));
     this.game.renderer.resize(window.innerWidth, window.innerHeight);
   }
 
   private startGame(loader: any, res: any) {
+    console.log(res.bitmapFontLight.bitmapFont);
     this.game.stage.position.set(window.innerWidth / 2, window.innerHeight / 2);
     this.playfield = new Playfield(this.game, res);
     this.game.stage.addChild(this.playfield);
