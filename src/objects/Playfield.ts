@@ -7,7 +7,7 @@ import { PlayfieldPositionDescription } from './PlayfieldPositionDescription';
 
 export class Playfield extends Container {
   private readonly playfield: Sprite;
-  private fields: Array<Array<Field>>;
+  private readonly fields: Array<Array<Field>>;
 
   // init
   private matrix: MatrixType = [
@@ -15,8 +15,8 @@ export class Playfield extends Container {
     [0, 0, 0],
     [0, 0, 0],
   ];
-  private resources: any;
-  private game: any;
+  private readonly resources: any;
+  private readonly game: any;
 
   constructor(game: any, resources: any) {
     super();
@@ -234,9 +234,72 @@ export class Playfield extends Container {
     }
     if (whoIsWin === 1) {
       console.log('PLAYER IS WIN!');
+      this.activateHighlightsAndAnimation(1);
     }
     if (whoIsWin === 2) {
       console.log('PC IS WIN!');
+      this.activateHighlightsAndAnimation(2);
+    }
+  }
+
+  private activateHighlightsAndAnimation(whoIsWin: 0 | 1 | 2): void {
+    //1 = player, 2 = pc, 0 = dra
+    let animationSelector;
+    if (whoIsWin === 1) {
+      animationSelector = 'cross-win';
+    } else if (whoIsWin === 2) {
+      animationSelector = 'circle-win';
+    } else {
+      animationSelector = null;
+    }
+    // check horizontal lines
+    let counterIterable = 0;
+    for (let i = 0; i < 3; i++) {
+      if (this.matrix[i][0] === whoIsWin && this.matrix[i][1] === whoIsWin && this.matrix[i][2] === whoIsWin) {
+        this.fields[i][0].changeTexture(4);
+        this.fields[i][0].winAnimationCreator(animationSelector);
+        this.fields[i][1].changeTexture(4);
+        this.fields[i][1].winAnimationCreator(animationSelector);
+        this.fields[i][2].changeTexture(4);
+        this.fields[i][2].winAnimationCreator(animationSelector);
+      } else {
+        counterIterable++;
+      }
+    }
+
+    // check vertical lines
+    counterIterable = 0;
+    for (let i = 0; i < 3; i++) {
+      counterIterable++;
+      if (this.matrix[0][i] === whoIsWin && this.matrix[1][i] === whoIsWin && this.matrix[2][i] === whoIsWin) {
+        this.fields[0][i].changeTexture(4);
+        this.fields[0][i].winAnimationCreator(animationSelector);
+        this.fields[1][i].changeTexture(4);
+        this.fields[1][i].winAnimationCreator(animationSelector);
+        this.fields[2][i].changeTexture(4);
+        this.fields[2][i].winAnimationCreator(animationSelector);
+      }
+    }
+
+    // check diagonal
+    counterIterable = 0;
+    for (let i = 0; i < 3; i++) {
+      counterIterable++;
+      if (this.matrix[0][0] === whoIsWin && this.matrix[1][1] === whoIsWin && this.matrix[2][2] === whoIsWin) {
+        this.fields[0][0].changeTexture(4);
+        this.fields[0][0].winAnimationCreator(animationSelector);
+        this.fields[1][1].changeTexture(4);
+        this.fields[1][1].winAnimationCreator(animationSelector);
+        this.fields[2][2].changeTexture(4);
+        this.fields[2][2].winAnimationCreator(animationSelector);
+      } else if (this.matrix[0][2] === whoIsWin && this.matrix[1][1] === whoIsWin && this.matrix[2][0] === whoIsWin) {
+        this.fields[0][2].changeTexture(4);
+        this.fields[0][2].winAnimationCreator(animationSelector);
+        this.fields[1][1].changeTexture(4);
+        this.fields[1][1].winAnimationCreator(animationSelector);
+        this.fields[2][0].changeTexture(4);
+        this.fields[2][0].winAnimationCreator(animationSelector);
+      }
     }
   }
 }
