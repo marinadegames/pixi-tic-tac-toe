@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js';
-import { Container, Sprite, Texture } from 'pixi.js';
+import { Container, Graphics, Sprite, Texture } from 'pixi.js';
 import type { MatrixType } from '../descriptions';
 import { Field } from './Field';
 import { GameEventEmitter } from './EventEmmiter';
@@ -15,24 +15,62 @@ export class Playfield extends Container {
     [0, 0, 0],
     [0, 0, 0],
   ];
-  private resources: any;
-  private game: any;
+  private readonly resources;
+  private readonly game;
+  private readonly restartButtonContainer: Container;
 
-  constructor(game: any, resources: any) {
+  constructor(game, resources) {
     super();
     this.game = game;
     this.resources = resources;
     this.fields = [[], [], []];
-
+    this.restartButtonContainer = new Container();
     this.playfield = new Sprite(Texture.from('playfield'));
     this.playfield.anchor.set(0.5, 0.5);
-    this.addChild(this.playfield);
     this.fieldsCreator();
+    this.createRestartButton();
 
-    // @ts-ignore
-    window['FIELDS'] = this.fields;
+    this.addChild(this.restartButtonContainer);
+    this.addChild(this.playfield);
 
+    // events
     GameEventEmitter.on('FIELD_CLICK_HANDLER', (args) => this.clickFieldHandler(args));
+  }
+
+  private createRestartButton() {
+    const btn = new Graphics();
+    btn.beginFill(0x00a492);
+    btn.drawRoundedRect(window.screenX / 2 - 150, window.screenY / 2 + 450, 300, 120, 20);
+    this.restartButtonContainer.interactive = true;
+    this.restartButtonContainer.buttonMode = true;
+    const btnText: PIXI.Text = new PIXI.Text('RESTART', {
+      fontSize: 40,
+      fill: 'white',
+      fontWeight: '600',
+      fontFamily: 'Roboto, sans-serif',
+    });
+    btnText.position.set(window.screenX / 2 - 90, window.screenY / 2 + 485);
+    this.restartButtonContainer.on('pointerdown', () => this.restartHandler());
+    this.restartButtonContainer.addChild(btn);
+    this.restartButtonContainer.addChild(btnText);
+  }
+
+  private restartHandler() {
+    this.matrix = [
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+    ];
+
+    for (let i = 0; i < this.matrix.length; i++) {
+      for (let j = 0; j < this.matrix[i].length; j++) {
+        this.fields[i][j].destroy();
+      }
+    }
+
+    this.fields = [[], [], []];
+
+    this.fieldsCreator();
   }
 
   private fieldsCreator() {
@@ -234,9 +272,72 @@ export class Playfield extends Container {
     }
     if (whoIsWin === 1) {
       console.log('PLAYER IS WIN!');
+      this.activateHighlightsAndAnimation(1);
     }
     if (whoIsWin === 2) {
       console.log('PC IS WIN!');
+      this.activateHighlightsAndAnimation(2);
+    }
+  }
+
+  private activateHighlightsAndAnimation(whoIsWin: 0 | 1 | 2): void {
+    //1 = player, 2 = pc, 0 = dra
+    let animationSelector;
+    if (whoIsWin === 1) {
+      animationSelector = 'cross-win';
+    } else if (whoIsWin === 2) {
+      animationSelector = 'circle-win';
+    } else {
+      animationSelector = null;
+    }
+    // check horizontal lines
+    let counterIterable = 0;
+    for (let i = 0; i < 3; i++) {
+      if (this.matrix[i][0] === whoIsWin && this.matrix[i][1] === whoIsWin && this.matrix[i][2] === whoIsWin) {
+        this.fields[i][0].changeTexture(4);
+        this.fields[i][0].winAnimationCreator(animationSelector);
+        this.fields[i][1].changeTexture(4);
+        this.fields[i][1].winAnimationCreator(animationSelector);
+        this.fields[i][2].changeTexture(4);
+        this.fields[i][2].winAnimationCreator(animationSelector);
+      } else {
+        counterIterable++;
+      }
+    }
+
+    // check vertical lines
+    counterIterable = 0;
+    for (let i = 0; i < 3; i++) {
+      counterIterable++;
+      if (this.matrix[0][i] === whoIsWin && this.matrix[1][i] === whoIsWin && this.matrix[2][i] === whoIsWin) {
+        this.fields[0][i].changeTexture(4);
+        this.fields[0][i].winAnimationCreator(animationSelector);
+        this.fields[1][i].changeTexture(4);
+        this.fields[1][i].winAnimationCreator(animationSelector);
+        this.fields[2][i].changeTexture(4);
+        this.fields[2][i].winAnimationCreator(animationSelector);
+      }
+    }
+
+    // check diagonal
+    counterIterable = 0;
+    for (let i = 0; i < 3; i++) {
+      counterIterable++;
+      if (this.matrix[0][0] === whoIsWin && this.matrix[1][1] === whoIsWin && this.matrix[2][2] === whoIsWin) {
+        this.fields[0][0].changeTexture(4);
+        this.fields[0][0].winAnimationCreator(animationSelector);
+        this.fields[1][1].changeTexture(4);
+        this.fields[1][1].winAnimationCreator(animationSelector);
+        this.fields[2][2].changeTexture(4);
+        this.fields[2][2].winAnimationCreator(animationSelector);
+      } else if (this.matrix[0][2] === whoIsWin && this.matrix[1][1] === whoIsWin && this.matrix[2][0] === whoIsWin) {
+        this.fields[0][2].changeTexture(4);
+        this.fields[0][2].winAnimationCreator(animationSelector);
+        this.fields[1][1].changeTexture(4);
+        this.fields[1][1].winAnimationCreator(animationSelector);
+        this.fields[2][0].changeTexture(4);
+        this.fields[2][0].winAnimationCreator(animationSelector);
+      }
     }
   }
 }
